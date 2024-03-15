@@ -9,7 +9,7 @@ molecular dynamics approach to analyze combinations of both factors. Our finding
 significantly impact the structural characteristics of the complex, particularly concerning hydrogen bonds, hydrophobic
 interactions, and ionic contacts. Both direct and indirect (water bridges) hydrogen bond contacts are examined. Remarkably, for
 most collagen analogs, a strong correlation between binding free energy and DD is observed.
-
+![Dock site table](Chitosan_Collagen.png)
 
 ## Installation
 
