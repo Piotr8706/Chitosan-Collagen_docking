@@ -1,15 +1,47 @@
 # Chitosan-Collagen_docking
 
-Chitosan-collagen blends find extensive applications in tissue engineering, treating joint diseases, and various biomedical
-disciplines. Understanding the interaction between chitosan and collagen type II is crucial for modulating mechanical
-properties, crucial for designing biomaterials suitable for cartilage and synovial fluid regeneration. However, numerous
-structural features influence chitosan's affinity for collagen, with the deacetylation degree (DD) of chitosan and the
-hydroxylation degree (HD) of PRO moieties in collagen being among the most significant. This study employs a highly efficient
-molecular dynamics approach to analyze combinations of both factors. Our findings reveal that modifications in DD and HD
-significantly impact the structural characteristics of the complex, particularly concerning hydrogen bonds, hydrophobic
-interactions, and ionic contacts. Both direct and indirect (water bridges) hydrogen bond contacts are examined. Remarkably, for
-most collagen analogs, a strong correlation between binding free energy and DD is observed.
-![Dock site table](Chitosan_Collagen.png)
+Chitosan-collagen blends find extensive applications in tissue engineering, treating joint diseases, and various biomedical disciplines. Understanding the interaction between chitosan and collagen type II is crucial for modulating mechanical properties, crucial for designing biomaterials suitable for cartilage and synovial fluid regeneration. However, numerous structural features influence chitosan's affinity for collagen, with the deacetylation degree (DD) of chitosan and the hydroxylation degree (HD) of PRO moieties in collagen being among the most significant. This study employs a highly efficient molecular dynamics approach to analyze combinations of both factors. Our findings reveal that modifications in DD and HD significantly impact the structural characteristics of the complex, particularly concerning hydrogen bonds, hydrophobic interactions, and ionic contacts. Both direct and indirect (water bridges) hydrogen bond contacts are examined. Remarkably, for most collagen analogs, a strong correlation between binding free energy and DD is observed.
+![Dock site table](Files/Chitosan_Collagen.png)
+
+## Data description
+
+In this investigation, the collagen II structure, denoted as (Pro-Hyp-Gly)3-Arg-Ala-Gly-Glu-Pro-Gly-Leu-
+Gln-Gly-Pro-Ala-Gly-(Pro-Hyp-Gly)3, sourced from the protein data bank (PDB) under code
+6JEC, was utilized. This structure features a common motif consisting of twelve amino acid residues, which is characteristic of human type II collagen. To ensure the stability of the triple-helical assembly, the peptide chains were terminated with (Pro-Hyp-Gly)3 triplets. Trans-4-Hydroxy-L-proline was selected for this study due to its prevalence in collagen.
+
+The hydroxylation degree within the collagen chain was adjusted by introducing or removing OH groups from PRO
+and HYP moieties. Peptide structures with varying hydroxylation degrees (HD) including 0, 6 (HD = 0.14), 12
+(HD = 0.29), 18 (HD = 0.43, original structure), 24 (HD = 0.57), 30 (HD = 0.72), 36 (HD = 0.86), 
+and 42 (HD =1) were considered. Table S1 in the Supplementary Information provides the positions of HYP/PRO residues for each of the ten variants corresponding to a given HD. Multiple randomly hydroxylated structures were generated
+for each HD using MATLAB's built-in random number generator. This randomization of PRO/HYP positions aimed to
+enhance the statistical significance of the results. A similar randomization approach was adopted for
+deacetylation on chitosan, where five variations of each degree of deacetylation (DD) were prepared to account
+for the randomization of acetyl group positions in chitosan of a given DD. Notably, while PRO hydroxylation at
+position 3 is more significant in collagen IV than collagen II, 4-hydroxylation holds importance from the
+perspective of collagen tertiary structure.
+
+The subsequent phenomenon, chitosan deacetylation, was illustrated in Figure 1b. For this depiction, the chitin structure retrieved from the PubChem database (800 Da) was employed to construct chitosan structures characterized by DD ranging from 12.5% to 100%.
+
+## Results 
+
+The results obtained exhibit a level of intuitiveness and alignment with certain experimental findings documented in existing literature. The collagen structures employed in this study depict a segment of human collagen type II, featuring a tertiary structural arrangement and the presence of critical residues and fragments, notably the prevalent triplet PRO-HYP-GLY. Despite the relatively short nature of the utilized peptide helices, they appear to offer sufficient insight into how the ratio of HYP to PRO can impact chitosan's affinity for collagen. However, certain aspects warrant further exploration in subsequent studies, such as the influence of the quantity of individual residues on collagen's affinity for chitosan. This aspect seems particularly significant within the framework of collagen's polyelectrolytic nature.
+
+![Structure of HSA-HA complex](Files/Binding Energy_vs_dd.png)
+
+## Description 
+
+The script performs the following tasks:
+
+1. **Data Extraction**: Reads data files (`bindenergy_Mg.tab`) to extract binding energy or interaction data for different hydroxylation degrees.
+2. **Data Analysis**: Analyzes the extracted data to calculate averages, standard deviations, and R2 values for each set of values.
+3. **Visualization**: Generates plots depicting the relationship between interaction type and deacetylation degree, along with linear regression lines and R2 values.
+
+## Example
+
+For example, the script is currently set to analyze hydrogen bonds. You can modify the `interaction_type` variable to analyze other types of interactions such as 'Binding Energy'.
+
+```python
+interaction_type = "Hydrogen Bonds"
 
 ## Installation
 
