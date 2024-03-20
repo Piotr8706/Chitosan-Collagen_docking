@@ -18,7 +18,7 @@ most collagen analogs, a strong correlation between binding free energy and DD i
 3. Install the required dependencies using pip:
 
     ```
-    pip install pandas matplotlib numpy
+    pip install -r requirements.txt
     ```
 
 ## Usage
