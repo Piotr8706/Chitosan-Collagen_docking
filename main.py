@@ -5,11 +5,18 @@ import re
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 from os.path import join
-
+import glob
 
 def read_data_bindenergy(mypath: str,interaction_type: str) -> dict:
     """
-    Binding energy extraction, i.e. second column from *bindenergy_Mg.tab files
+    Binding energy extraction, i.e. second column from *bindenergy_Mg.tab files.
+    Note: there are ~1500 files depending on the case. There are three cases where the is one variant of 
+    collagen HD: 0(no hydroxylation), 0.43(native) and 1(full hydroxylation). In other cases there are 5 variants
+    of collagen for each HD. In total there are around 40000 structures to be evaluated. There is binding energy
+    file and analysis file. The latter contains information about hydrogen bonds, ionic and 
+    hydrophobic interactions. Due to limitations on computations on supercomputers. The calculation of
+    binding energy is much more demanding so this quantity was measured for much shorter.
+
     """
     filenames = next(walk(mypath), (None, None, []))[2]  # find all files from directory [] if no file
     pattern = '[1-9]\d{2,3}' # find values that repersent different deacetylation degrees 125:1000:125
@@ -34,7 +41,7 @@ def read_data_bindenergy(mypath: str,interaction_type: str) -> dict:
 
     return result
 
-def create_figure(datasets: list, interaction_type: str) -> None:
+def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
     colors = ['red', 'blue', 'green', 'orange', 'purple', 'pink']  # Define colors for different datasets
     num_datasets = len(datasets)
     if num_datasets > len(colors):
@@ -63,7 +70,6 @@ def create_figure(datasets: list, interaction_type: str) -> None:
 
         # Calculate R2 value
         r_squared = r2_score(y_means, y_pred)
-        HD = [0.00, 0.43, 1.00]
         # Plot data points with error bars and the fitting line
         plt.errorbar(x_values, y_means, yerr=y_sems, fmt='o', label=f'HD = {HD[i]}', color=colors[i])
         plt.plot(x_values, y_pred, color=colors[i], linestyle='-')
@@ -79,23 +85,21 @@ def create_figure(datasets: list, interaction_type: str) -> None:
     plt.ylabel(interaction_type)
     plt.legend(loc='lower right')
 
-    path = r"./Files/" + interaction_type + r"_vs_dd.png"
+    path = r"./Files/" + interaction_type.replace(' ','') + r"_vs_dd.png"
     plt.savefig(path)
 
 def deacetylation_degree_analysis():
     pass
 
-def hydroxylation_degree_analysis(interaction_type: str) -> list:
+def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     """
-    Extracting data for a given interaction type for all hydroxylation degrees
+    Extracting data for a given interaction type for selected hydroxylation degrees
     """
+    HD_cases = ["Wyniki_" + str(int(42 * x)) + "HYP" for x in HD] 
     mypath = r"C:\Users\piotr\Downloads\Collagen+Chitosan\Collagen+Chitosan"
-    if interaction_type == "Binding Energy":
-        subdir = "Bindenergy\\"
-    else:
-        subdir = "Analysis\\"
-    directories = next(walk(mypath), (None, None, []))[1]
-    filtered_directories = [join(mypath,dir,subdir) for dir in directories if dir.startswith('W')]
+    subdir = "Bindenergy\\" if interaction_type == "Binding Energy" else "Analysis\\"
+    
+    filtered_directories = [join(mypath, path, subdir) for path in HD_cases]
     data = []
     for element in filtered_directories:
         d = read_data_bindenergy(element, interaction_type)
@@ -108,9 +112,9 @@ def amino_acids(a):
 
 def main():
     interaction_type = "Hydrogen Bonds"
-    f1 = hydroxylation_degree_analysis(interaction_type)
-    create_figure([f1[0], f1[5], f1[20]],interaction_type)
-   
+    HD = [0, 0.43, 1]
+    f1 = hydroxylation_degree_analysis(HD, interaction_type)
+    create_figure(f1, HD, interaction_type)
 
 if __name__=="__main__":
     main()
