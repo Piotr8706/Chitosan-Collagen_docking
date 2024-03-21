@@ -26,7 +26,7 @@ The subsequent phenomenon, chitosan deacetylation, was illustrated in Figure 1b.
 
 The results obtained exhibit a level of intuitiveness and alignment with certain experimental findings documented in existing literature. The collagen structures employed in this study depict a segment of human collagen type II, featuring a tertiary structural arrangement and the presence of critical residues and fragments, notably the prevalent triplet PRO-HYP-GLY. Despite the relatively short nature of the utilized peptide helices, they appear to offer sufficient insight into how the ratio of HYP to PRO can impact chitosan's affinity for collagen. However, certain aspects warrant further exploration in subsequent studies, such as the influence of the quantity of individual residues on collagen's affinity for chitosan. This aspect seems particularly significant within the framework of collagen's polyelectrolytic nature.
 
-![Structure of HSA-HA complex](Files/Binding Energy_vs_dd.png)
+![Binding Energy](Files/BindingEnergy_vs_dd.png)
 
 ## Description 
 
@@ -35,13 +35,6 @@ The script performs the following tasks:
 1. **Data Extraction**: Reads data files (`bindenergy_Mg.tab`) to extract binding energy or interaction data for different hydroxylation degrees.
 2. **Data Analysis**: Analyzes the extracted data to calculate averages, standard deviations, and R2 values for each set of values.
 3. **Visualization**: Generates plots depicting the relationship between interaction type and deacetylation degree, along with linear regression lines and R2 values.
-
-## Example
-
-For example, the script is currently set to analyze hydrogen bonds. You can modify the `interaction_type` variable to analyze other types of interactions such as 'Binding Energy'.
-
-```python
-interaction_type = "Hydrogen Bonds"
 
 ## Installation
 
@@ -76,4 +69,4 @@ Contributions to this project are welcome. If you find any issues or have sugges
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the (LICENSE) file for details.
