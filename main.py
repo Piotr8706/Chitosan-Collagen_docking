@@ -7,7 +7,7 @@ from sklearn.metrics import r2_score
 from os.path import join
 import glob
 
-def read_data_bindenergy(mypath: str,interaction_type: str) -> dict:
+def read_data_for_interation(mypath: str,interaction_type: str) -> dict:
     """
     Binding energy extraction, i.e. second column from *bindenergy_Mg.tab files.
     Note: there are ~1500 files depending on the case. There are three cases where the is one variant of 
@@ -20,6 +20,9 @@ def read_data_bindenergy(mypath: str,interaction_type: str) -> dict:
     """
     filenames = next(walk(mypath), (None, None, []))[2]  # find all files from directory [] if no file
     pattern = '[1-9]\d{2,3}' # find values that repersent different deacetylation degrees 125:1000:125
+    # Analyze deacetylation degree: match pattern below (add new variable to function) and goes over all 
+    # directories Wyniki_* to extract specific DD 
+    #pattern = rf'{pattern_variable}'
     digits = np.unique([re.findall(pattern, filename)[0] for filename in filenames])
     result = {}
     # create dictionary of all binding energies from each deacetylation degree
@@ -42,6 +45,9 @@ def read_data_bindenergy(mypath: str,interaction_type: str) -> dict:
     return result
 
 def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
+    """
+    Drawing the data with best fitting line. Due to dense data set it is advised to plot max 4 lines
+    """
     colors = ['red', 'blue', 'green', 'orange', 'purple', 'pink']  # Define colors for different datasets
     num_datasets = len(datasets)
     if num_datasets > len(colors):
@@ -75,10 +81,9 @@ def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
         plt.plot(x_values, y_pred, color=colors[i], linestyle='-')
 
         # Add equation and R2 value to the plot
-        equation = f'Y = {slope:.2f}X + {intercept:.2f}'
-        r_squared_text = f'R2 = {r_squared:.2f}'
-        plt.text(0.5, 0.35 + 0.2*i, equation, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color=colors[i])
-        plt.text(0.5, 0.30 + 0.2*i, r_squared_text, ha='center', va='center', transform=plt.gca().transAxes, fontsize=10, color=colors[i])
+        #equation = f'Y = {slope:.4f}X + {intercept:.2f}'
+        # Add R2 value below the first point
+        plt.text(x_values[6], 0.95 * y_means[6], r'$R^2 = {:.2f}$'.format(r_squared), fontsize=10, ha='center')
 
     plt.title(interaction_type + " vs deacetylation degree")
     plt.xlabel("Deacetylation degree [%]")
@@ -89,11 +94,14 @@ def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
     plt.savefig(path)
 
 def deacetylation_degree_analysis():
+    """
+    Extracting data for a given interaction type for selected chitosan deacetylation degrees
+    """
     pass
 
 def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     """
-    Extracting data for a given interaction type for selected hydroxylation degrees
+    Extracting data for a given interaction type for selected colagen hydroxylation degrees
     """
     HD_cases = ["Wyniki_" + str(int(42 * x)) + "HYP" for x in HD] 
     mypath = r"C:\Users\piotr\Downloads\Collagen+Chitosan\Collagen+Chitosan"
@@ -102,7 +110,7 @@ def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     filtered_directories = [join(mypath, path, subdir) for path in HD_cases]
     data = []
     for element in filtered_directories:
-        d = read_data_bindenergy(element, interaction_type)
+        d = read_data_for_interation(element, interaction_type)
         data.append(d)
     return data
 
@@ -111,7 +119,7 @@ def amino_acids(a):
    
 
 def main():
-    interaction_type = "Hydrogen Bonds"
+    interaction_type = "Ionic Interactions"
     HD = [0, 0.43, 1]
     f1 = hydroxylation_degree_analysis(HD, interaction_type)
     create_figure(f1, HD, interaction_type)
