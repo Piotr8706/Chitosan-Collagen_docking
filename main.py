@@ -9,14 +9,20 @@ import glob
 
 def read_data_for_interation(mypath: str,interaction_type: str) -> dict:
     """
-    Binding energy extraction, i.e. second column from *bindenergy_Mg.tab files.
-    Note: there are ~1500 files depending on the case. There are three cases where the is one variant of 
-    collagen HD: 0(no hydroxylation), 0.43(native) and 1(full hydroxylation). In other cases there are 5 variants
-    of collagen for each HD. In total there are around 40000 structures to be evaluated. There is binding energy
+    Data for given interaction extraction, i.e. second column from *bindenergy_Mg.tab files for binding
+    energies, for other interactions we take 8 columns that represent contribution of each amino acid
+    building blocks of collagen variant. We look specifically into HD which is a #HYP/(#HYP + #PRO) amino
+    acids. Note: there are ~1500 files depending on the case. The values from simulations
+    take following range of HD values: [0.00, 0.14, 0.29, 0.43, 0.57, 0.71, 0.86, 1.00]. 
+    There are three cases where the is one variant of collagen HD: 0(no hydroxylation), 0.43(native) 
+    and 1(full hydroxylation). In other cases there are 5 variants of collagen for each HD. 
+    In total there are around 40000 structures to be evaluated. There is binding energy
     file and analysis file. The latter contains information about hydrogen bonds, ionic and 
     hydrophobic interactions. Due to limitations on computations on supercomputers. The calculation of
-    binding energy is much more demanding so this quantity was measured for much shorter.
-
+    binding energy is much more demanding so this quantity was measured for much shorter. 
+    Additionally the data can be gathered for DD for chitosan [0.125:1:0.125]
+    These function extracts specific data for specific case and returns dictionary of all structures specified
+    interaction.
     """
     filenames = next(walk(mypath), (None, None, []))[2]  # find all files from directory [] if no file
     pattern = '[1-9]\d{2,3}' # find values that repersent different deacetylation degrees 125:1000:125
@@ -115,6 +121,10 @@ def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     return data
 
 def amino_acids(a):
+    """
+    This function is assigning amino acid contribution to selected interaction. 
+    Doesn't work for binding energy
+    """
     AA = ['ALA' 'ARG' 'GLN' 'GLU' 'GLY' 'HYP' 'LEU' 'PRO']
    
 
