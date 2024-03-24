@@ -26,12 +26,16 @@ The subsequent phenomenon, chitosan deacetylation, was illustrated in Figure 1b.
 
 The results obtained exhibit a level of intuitiveness and alignment with certain experimental findings documented in existing literature. The collagen structures employed in this study depict a segment of human collagen type II, featuring a tertiary structural arrangement and the presence of critical residues and fragments, notably the prevalent triplet PRO-HYP-GLY. Despite the relatively short nature of the utilized peptide helices, they appear to offer sufficient insight into how the ratio of HYP to PRO can impact chitosan's affinity for collagen. However, certain aspects warrant further exploration in subsequent studies, such as the influence of the quantity of individual residues on collagen's affinity for chitosan. This aspect seems particularly significant within the framework of collagen's polyelectrolytic nature.
 
+### Binding Energy
 ![Binding Energy](Files/BindingEnergy_vs_dd.png)
-Binding energy
+
+### Hydrogen Bonds
 ![HydBond](Files/HydrogenBonds_vs_dd.png)
-Hydrogen Bonds
+
+### Hydrophobic Interactions
 ![HP](Files/HydrophobicInteractions_vs_dd.png)
-Hydrophobic Interactions
+
+### Ionic Interactions
 ![Ion](Files/IonicInteractions_vs_dd.png)
 Ionic Interactions
 
