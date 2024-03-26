@@ -5,7 +5,7 @@ import re
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 from os.path import join
-import glob
+import json
 
 def read_data_for_interation(mypath: str,interaction_type: str) -> dict:
     """
@@ -104,6 +104,33 @@ def deacetylation_degree_analysis():
     Extracting data for a given interaction type for selected chitosan deacetylation degrees
     """
     pass
+def save_cleaned_data_to_file(data, filename, HD, interaction_type):
+    """Save extracted data to JSON file for ML model"""
+    AA = ['ALA', 'ARG', 'GLN', 'GLU', 'GLY', 'HYP', 'LEU', 'PRO']
+    with open(filename, 'w') as json_file:
+        all_data = {}
+        for i, dictionary in enumerate(data):
+            cleaned_data = {}
+            for degree, values in dictionary.items():
+                if interaction_type != 'Binding Energy':
+                    # Use AA keys for all types of interactions except 'Binding Energy'
+                    cleaned_values = [{'AA': {AA[j]: value.tolist() if isinstance(value, pd.Series) else value for j, (key, value) in enumerate(zip(AA, degree_values))}} for degree_values in values]
+                else:
+                    cleaned_values = []
+                    for item in values:
+                        # Convert any remaining Pandas Series objects to lists
+                        cleaned_item = {key: value.tolist() if isinstance(value, pd.Series) else value for key, value in item.items()}
+                        # Convert any nested Series to lists
+                        cleaned_item = {key: [sub_item.tolist() if isinstance(sub_item, pd.Series) else sub_item for sub_item in value] if isinstance(value, list) else value for key, value in cleaned_item.items()}
+                        cleaned_values.append(cleaned_item)
+                    
+                cleaned_data[degree] = cleaned_values
+            
+            # Add data for each HD value to the JSON structure
+            all_data[str(HD[i])] = cleaned_data
+        
+        json.dump(all_data, json_file, indent=4)
+
 
 def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     """
@@ -130,9 +157,9 @@ def amino_acids(a):
 
 def main():
     interaction_type = "Ionic Interactions"
-    HD = [0, 0.43, 1]
+    HD = [0, 0.14, 0.29, 0.43, 0.57, 0.71, 0.86, 1]
     f1 = hydroxylation_degree_analysis(HD, interaction_type)
-    create_figure(f1, HD, interaction_type)
-
+    #create_figure(f1, HD, interaction_type)
+    save_cleaned_data_to_file(f1,'./Files/Ionic_Interactions.json', HD, interaction_type)
 if __name__=="__main__":
     main()
