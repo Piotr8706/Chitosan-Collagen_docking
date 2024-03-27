@@ -7,7 +7,7 @@ from sklearn.metrics import r2_score
 from os.path import join
 import json
 
-def read_data_for_interation(mypath: str,interaction_type: str) -> dict:
+def read_data_for_interaction(mypath: str, interaction_type: str) -> pd.DataFrame:
     """
     Data for given interaction extraction, i.e. second column from *bindenergy_Mg.tab files for binding
     energies, for other interactions we take 8 columns that represent contribution of each amino acid
@@ -25,30 +25,44 @@ def read_data_for_interation(mypath: str,interaction_type: str) -> dict:
     interaction.
     """
     filenames = next(walk(mypath), (None, None, []))[2]  # find all files from directory [] if no file
-    pattern = '[1-9]\d{2,3}' # find values that repersent different deacetylation degrees 125:1000:125
+    pattern = '[1-9]\d{2,3}' # find values that represent different deacetylation degrees 125:1000:125
     # Analyze deacetylation degree: match pattern below (add new variable to function) and goes over all 
     # directories Wyniki_* to extract specific DD 
     #pattern = rf'{pattern_variable}'
     digits = np.unique([re.findall(pattern, filename)[0] for filename in filenames])
-    result = {}
-    # create dictionary of all binding energies from each deacetylation degree
+    data_list = []
+    
+    # Iterate over each digit (HD)
     for digit in digits:
         files_with_digit = [filename for filename in filenames if digit in filename]
-        bindenergies = []
+        
+        # Iterate over each file with the current digit
         for filename in files_with_digit:
-            match interaction_type:
-                case 'Binding Energy':
-                    data = pd.read_table(mypath + filename, delim_whitespace=True, header=0, usecols=[1], nrows=31).mean()
-                case 'Hydrogen Bonds':
-                    data = pd.read_table(mypath + filename, delim_whitespace=True, header=70, usecols=list(range(27, 35)), nrows=31).mean()
-                case 'Hydrophobic Interactions':
-                    data = pd.read_table(mypath + filename, delim_whitespace=True, header=70, usecols=list(range(35, 43)), nrows=31).mean()
-                case 'Ionic Interactions':
-                    data = pd.read_table(mypath + filename, delim_whitespace=True, header=70, usecols=list(range(43, 51)), nrows=31).mean()
-            bindenergies.append(data)
-        result[digit] = bindenergies
+            file_path = join(mypath, filename)
+            
+            # Read data based on interaction type
+            if interaction_type == 'Binding Energy':
+                data = pd.read_table(file_path, delim_whitespace=True, header=0, usecols=[1], nrows=31).mean()
+            elif interaction_type == 'Hydrogen Bonds':
+                data = pd.read_table(file_path, delim_whitespace=True, header=70, usecols=list(range(27, 35)), nrows=31).mean()
+            elif interaction_type == 'Hydrophobic Interactions':
+                data = pd.read_table(file_path, delim_whitespace=True, header=70, usecols=list(range(35, 43)), nrows=31).mean()
+            elif interaction_type == 'Ionic Interactions':
+                data = pd.read_table(file_path, delim_whitespace=True, header=70, usecols=list(range(43, 51)), nrows=31).mean()
+            else:
+                raise ValueError("Invalid interaction type.")
+                
+            data_list.append((digit, 1, *data.values))
+    
+    # Convert data list to DataFrame
+    if interaction_type == 'Binding Energy':
+        df = pd.DataFrame(data_list, columns=['DD', 'HD', 'Binding_Energy'])
+    else:
+        amino_acids = ["ALA", "ARG", "GLN", "GLU", "GLY", "HYP", "LEU", "PRO"]
+        columns = ['HD', 'DD'] + [f"{interaction_type}_{aa}" for aa in amino_acids]
+        df = pd.DataFrame(data_list, columns=columns)
 
-    return result
+    return df
 
 def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
     """
@@ -99,67 +113,44 @@ def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
     path = r"./Files/" + interaction_type.replace(' ','') + r"_vs_dd.png"
     plt.savefig(path)
 
-def deacetylation_degree_analysis():
-    """
-    Extracting data for a given interaction type for selected chitosan deacetylation degrees
-    """
+def join_data(*args):
     pass
-def save_cleaned_data_to_file(data, filename, HD, interaction_type):
-    """Save extracted data to JSON file for ML model"""
-    AA = ['ALA', 'ARG', 'GLN', 'GLU', 'GLY', 'HYP', 'LEU', 'PRO']
-    with open(filename, 'w') as json_file:
-        all_data = {}
-        for i, dictionary in enumerate(data):
-            cleaned_data = {}
-            for degree, values in dictionary.items():
-                if interaction_type != 'Binding Energy':
-                    # Use AA keys for all types of interactions except 'Binding Energy'
-                    cleaned_values = [{'AA': {AA[j]: value.tolist() if isinstance(value, pd.Series) else value for j, (key, value) in enumerate(zip(AA, degree_values))}} for degree_values in values]
-                else:
-                    cleaned_values = []
-                    for item in values:
-                        # Convert any remaining Pandas Series objects to lists
-                        cleaned_item = {key: value.tolist() if isinstance(value, pd.Series) else value for key, value in item.items()}
-                        # Convert any nested Series to lists
-                        cleaned_item = {key: [sub_item.tolist() if isinstance(sub_item, pd.Series) else sub_item for sub_item in value] if isinstance(value, list) else value for key, value in cleaned_item.items()}
-                        cleaned_values.append(cleaned_item)
-                    
-                cleaned_data[degree] = cleaned_values
-            
-            # Add data for each HD value to the JSON structure
-            all_data[str(HD[i])] = cleaned_data
-        
-        json.dump(all_data, json_file, indent=4)
-
 
 def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     """
-    Extracting data for a given interaction type for selected colagen hydroxylation degrees
+    Extracting data for a given interaction type for selected collagen hydroxylation degrees
     """
     HD_cases = ["Wyniki_" + str(int(42 * x)) + "HYP" for x in HD] 
     mypath = r"C:\Users\piotr\Downloads\Collagen+Chitosan\Collagen+Chitosan"
     subdir = "Bindenergy\\" if interaction_type == "Binding Energy" else "Analysis\\"
     
     filtered_directories = [join(mypath, path, subdir) for path in HD_cases]
-    data = []
+    data_list = []
     for element in filtered_directories:
-        d = read_data_for_interation(element, interaction_type)
-        data.append(d)
-    return data
-
-def amino_acids(a):
-    """
-    This function is assigning amino acid contribution to selected interaction. 
-    Doesn't work for binding energy
-    """
-    AA = ['ALA' 'ARG' 'GLN' 'GLU' 'GLY' 'HYP' 'LEU' 'PRO']
-   
+        df = read_data_for_interaction(element, interaction_type)
+        data_list.append(df)
+    
+    return pd.concat(data_list, ignore_index=True)
 
 def main():
-    interaction_type = "Ionic Interactions"
+    #interaction_type = 
+    #HD= [0, 1]
     HD = [0, 0.14, 0.29, 0.43, 0.57, 0.71, 0.86, 1]
-    f1 = hydroxylation_degree_analysis(HD, interaction_type)
+    bind_energy = hydroxylation_degree_analysis(HD, "Binding Energy")
+    hbond = hydroxylation_degree_analysis(HD, "Hydrogen Bonds")
+    hydrophobic = hydroxylation_degree_analysis(HD, "Hydrophobic Interactions")
+    ionic = hydroxylation_degree_analysis(HD, "Ionic Interactions")
+    result = pd.concat([bind_energy, hbond, hydrophobic, ionic], axis=1, join="inner")
+    print(len(hbond))
+    print(len(bind_energy))
+    print(result)
+    result.to_csv('./Files/All_data_combined.csv')
+    #hydrophobic = hydroxylation_degree_analysis(HD, "Hydrophobic Interactions")
+    #ionic = hydroxylation_degree_analysis(HD, "Ionic Interactions")
     #create_figure(f1, HD, interaction_type)
-    save_cleaned_data_to_file(f1,'./Files/Ionic_Interactions.json', HD, interaction_type)
+    #save_cleaned_data_to_file(f1,'./Files/Ionic_Interactions.json', HD, interaction_type)
+    #save_extracted_data_to_file(bind_energy, hbond, hydrophobic, ionic, HD)
+
+
 if __name__=="__main__":
     main()
