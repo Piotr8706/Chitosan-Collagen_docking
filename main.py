@@ -7,7 +7,7 @@ from sklearn.metrics import r2_score
 from os.path import join
 import json
 
-def read_data_for_interaction(mypath: str, interaction_type: str) -> pd.DataFrame:
+def read_data_for_interaction(mypath: str, interaction_type: str, DD: float, HD: float) -> pd.DataFrame:
     """
     Data for given interaction extraction, i.e. second column from *bindenergy_Mg.tab files for binding
     energies, for other interactions we take 8 columns that represent contribution of each amino acid
@@ -52,14 +52,14 @@ def read_data_for_interaction(mypath: str, interaction_type: str) -> pd.DataFram
             else:
                 raise ValueError("Invalid interaction type.")
                 
-            data_list.append((digit, 1, *data.values))
+            data_list.append((DD, HD, *data.values))
     
     # Convert data list to DataFrame
     if interaction_type == 'Binding Energy':
         df = pd.DataFrame(data_list, columns=['DD', 'HD', 'Binding_Energy'])
     else:
         amino_acids = ["ALA", "ARG", "GLN", "GLU", "GLY", "HYP", "LEU", "PRO"]
-        columns = ['HD', 'DD'] + [f"{interaction_type}_{aa}" for aa in amino_acids]
+        columns = ['DD', 'HD'] + [f"{interaction_type}_{aa}" for aa in amino_acids]
         df = pd.DataFrame(data_list, columns=columns)
 
     return df
@@ -113,10 +113,7 @@ def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
     path = r"./Files/" + interaction_type.replace(' ','') + r"_vs_dd.png"
     plt.savefig(path)
 
-def join_data(*args):
-    pass
-
-def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
+def hydroxylation_degree_analysis(DD: list, HD: list, interaction_type: str) -> pd.DataFrame:
     """
     Extracting data for a given interaction type for selected collagen hydroxylation degrees
     """
@@ -126,31 +123,22 @@ def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> list:
     
     filtered_directories = [join(mypath, path, subdir) for path in HD_cases]
     data_list = []
-    for element in filtered_directories:
-        df = read_data_for_interaction(element, interaction_type)
+    for dd, hd, element in zip(DD, HD, filtered_directories):
+        df = read_data_for_interaction(element, interaction_type, dd, hd)
         data_list.append(df)
     
     return pd.concat(data_list, ignore_index=True)
 
 def main():
-    #interaction_type = 
-    #HD= [0, 1]
+    DD = [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]
     HD = [0, 0.14, 0.29, 0.43, 0.57, 0.71, 0.86, 1]
-    bind_energy = hydroxylation_degree_analysis(HD, "Binding Energy")
-    hbond = hydroxylation_degree_analysis(HD, "Hydrogen Bonds")
-    hydrophobic = hydroxylation_degree_analysis(HD, "Hydrophobic Interactions")
-    ionic = hydroxylation_degree_analysis(HD, "Ionic Interactions")
-    result = pd.concat([bind_energy, hbond, hydrophobic, ionic], axis=1, join="inner")
-    print(len(hbond))
-    print(len(bind_energy))
+    bind_energy = hydroxylation_degree_analysis(DD, HD, "Binding Energy")
+    hbond = hydroxylation_degree_analysis(DD, HD, "Hydrogen Bonds")
+    hydrophobic = hydroxylation_degree_analysis(DD, HD, "Hydrophobic Interactions")
+    ionic = hydroxylation_degree_analysis(DD, HD, "Ionic Interactions")
+    result = pd.concat([bind_energy, hbond, hydrophobic, ionic], axis=1, join="outer")
     print(result)
     result.to_csv('./Files/All_data_combined.csv')
-    #hydrophobic = hydroxylation_degree_analysis(HD, "Hydrophobic Interactions")
-    #ionic = hydroxylation_degree_analysis(HD, "Ionic Interactions")
-    #create_figure(f1, HD, interaction_type)
-    #save_cleaned_data_to_file(f1,'./Files/Ionic_Interactions.json', HD, interaction_type)
-    #save_extracted_data_to_file(bind_energy, hbond, hydrophobic, ionic, HD)
-
 
 if __name__=="__main__":
     main()
