@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 from os.path import join
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 def read_data_for_interaction(mypath: str, interaction_type: str) -> pd.DataFrame:
     """
@@ -33,7 +34,8 @@ def read_data_for_interaction(mypath: str, interaction_type: str) -> pd.DataFram
         numbers = re.findall(r'\d+',filename)
         HD = round(int(numbers[0]) / 42.0,2)
         DD = int(numbers[2]) / 1000.0
-        variant = int(numbers[3])
+        variant_HD = int(numbers[1])
+        variant_DD = int(numbers[3])
         position = int(numbers[4])
         file_path = join(mypath, filename)
         
@@ -49,14 +51,14 @@ def read_data_for_interaction(mypath: str, interaction_type: str) -> pd.DataFram
         else:
             raise ValueError("Invalid interaction type.")
             
-        data_list.append((DD, HD, variant, position, *data.values))
+        data_list.append((DD, HD, variant_HD, variant_DD, position, *data.values))
     
     # Convert data list to DataFrame
     if interaction_type == 'Binding Energy':
-        df = pd.DataFrame(data_list, columns=['DD', 'HD', 'Variant', 'Position', 'Binding_Energy'])
+        df = pd.DataFrame(data_list, columns=['DD', 'HD', 'Variant_HD', 'Variant_DD', 'Position', 'Binding_Energy'])
     else:
         amino_acids = ["ALA", "ARG", "GLN", "GLU", "GLY", "HYP", "LEU", "PRO"]
-        columns = ['DD', 'HD', 'Variant', 'Position'] + [f"{interaction_type}_{aa}" for aa in amino_acids]
+        columns = ['DD', 'HD', 'Variant_HD', 'Variant_DD', 'Position'] + [f"{interaction_type}_{aa}" for aa in amino_acids]
         df = pd.DataFrame(data_list, columns=columns)
 
     return df
@@ -110,6 +112,11 @@ def create_figure(datasets: list, HD: list, interaction_type: str) -> None:
     path = r"./Files/" + interaction_type.replace(' ','') + r"_vs_dd.png"
     plt.savefig(path)
 
+
+
+def process_directory(element, interaction_type):
+    return read_data_for_interaction(element, interaction_type)
+
 def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> pd.DataFrame:
     """
     Extracting data for a given interaction type for selected collagen hydroxylation degrees
@@ -118,23 +125,31 @@ def hydroxylation_degree_analysis(HD: list, interaction_type: str) -> pd.DataFra
     subdir = "Bindenergy\\" if interaction_type == "Binding Energy" else "Analysis\\"
     
     filtered_directories = [join(mypath, f"Wyniki_{round(42 * h)}HYP", subdir) for h in HD]
-    data_list = []
-    for element in filtered_directories:
-        df = read_data_for_interaction(element, interaction_type)
-        data_list.append(df)
+    #print(filtered_directories)
+    
+    # Initialize a ThreadPoolExecutor with a maximum of 8 threads (adjust as needed)
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        # Submit the processing of each directory to the executor
+        futures = [executor.submit(process_directory, element, interaction_type) for element in filtered_directories]
+        
+        # Gather results as they become available
+        data_list = [future.result() for future in futures]
     
     return pd.concat(data_list, ignore_index=True)
 
 
 def main():
     HD = [0, 0.14, 0.29, 0.43, 0.57, 0.71, 0.86, 1]
-    result = hydroxylation_degree_analysis(HD, "Binding Energy")
-    #hbond = hydroxylation_degree_analysis(HD, "Hydrogen Bonds")
-    #hydrophobic = hydroxylation_degree_analysis(DD, HD, "Hydrophobic Interactions")
-    #ionic = hydroxylation_degree_analysis(DD, HD, "Ionic Interactions")
-    #result = pd.merge(bind_energy, hbond, on=['HD','DD','variant','position'], join="left")
+    bind_energy = hydroxylation_degree_analysis(HD, "Binding Energy")
+    hbond = hydroxylation_degree_analysis(HD, "Hydrogen Bonds")
+    hydrophobic = hydroxylation_degree_analysis(HD, "Hydrophobic Interactions")
+    ionic = hydroxylation_degree_analysis(HD, "Ionic Interactions")
+    result = pd.merge(hbond, ionic, on=['HD','DD','Variant_HD', 'Variant_DD','Position'], how="left")
+    result = pd.merge(result, hydrophobic, on=['HD','DD','Variant_HD', 'Variant_DD','Position'], how="left")
+    result = pd.merge(result,  bind_energy, on=['HD','DD','Variant_HD', 'Variant_DD','Position'], how="outer")
+
     #print(result)
-    result.to_csv('./Files/All_data_combined.csv')
+    result.to_csv('./Files/All_interactions.csv')
 
 if __name__=="__main__":
     main()
