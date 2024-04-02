@@ -1,7 +1,12 @@
 # Chitosan-Collagen_docking
 
 Chitosan-collagen blends find extensive applications in tissue engineering, treating joint diseases, and various biomedical disciplines. Understanding the interaction between chitosan and collagen type II is crucial for modulating mechanical properties, crucial for designing biomaterials suitable for cartilage and synovial fluid regeneration. However, numerous structural features influence chitosan's affinity for collagen, with the deacetylation degree (DD) of chitosan and the hydroxylation degree (HD) of PRO moieties in collagen being among the most significant. This study employs a highly efficient molecular dynamics approach to analyze combinations of both factors. Our findings reveal that modifications in DD and HD significantly impact the structural characteristics of the complex, particularly concerning hydrogen bonds, hydrophobic interactions, and ionic contacts. Both direct and indirect (water bridges) hydrogen bond contacts are examined. Remarkably, for most collagen analogs, a strong correlation between binding free energy and DD is observed.
+
+### Collagen hydroxylation 
 ![Dock site table](Files/Chitosan_Collagen.png)
+
+### Chitosan deacethylation
+![Dock site table](Files/Deacethylation.jpg)
 
 ## Data description
 
@@ -22,11 +27,11 @@ perspective of collagen tertiary structure.
 
 The subsequent phenomenon, chitosan deacetylation, was illustrated in Figure 1b. For this depiction, the chitin structure retrieved from the PubChem database (800 Da) was employed to construct chitosan structures characterized by DD ranging from 12.5% to 100%.
 
-### Positions  of aminoacids
+### Positions  of aminoacids. PRO, GLY, and HYP amino acids are denoted by light blue, dark blue, and green colors, respectively.
 ![Positions](Files/AA_positions.png)
 
 ### Docking results
-![Positions](Positions.png)
+![Positions](Files/Positions.png)
 
 
 ## Results 
