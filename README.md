@@ -25,7 +25,7 @@ for the randomization of acetyl group positions in chitosan of a given DD. Notab
 position 3 is more significant in collagen IV than collagen II, 4-hydroxylation holds importance from the
 perspective of collagen tertiary structure.
 
-The subsequent phenomenon, chitosan deacetylation, was illustrated in Figure 1b. For this depiction, the chitin structure retrieved from the PubChem database (800 Da) was employed to construct chitosan structures characterized by DD ranging from 12.5% to 100%.
+Figure 1 b illustrates the subsequent phenomenon, chitosan deacetylation. For this depiction, the chitin structure retrieved from the PubChem database (800 Da) was employed to construct chitosan structures characterized by DD ranging from 12.5% to 100%.
 
 ### Positions  of aminoacids. PRO, GLY, and HYP amino acids are denoted by light blue, dark blue, and green colors, respectively.
 ![Positions](Files/AA_positions.png)
@@ -36,7 +36,7 @@ The subsequent phenomenon, chitosan deacetylation, was illustrated in Figure 1b.
 
 ## Results 
 
-The results obtained exhibit a level of intuitiveness and alignment with certain experimental findings documented in existing literature. The collagen structures employed in this study depict a segment of human collagen type II, featuring a tertiary structural arrangement and the presence of critical residues and fragments, notably the prevalent triplet PRO-HYP-GLY. Despite the relatively short nature of the utilized peptide helices, they appear to offer sufficient insight into how the ratio of HYP to PRO can impact chitosan's affinity for collagen. However, certain aspects warrant further exploration in subsequent studies, such as the influence of the quantity of individual residues on collagen's affinity for chitosan. This aspect seems particularly significant within the framework of collagen's polyelectrolytic nature.
+The results exhibit intuitiveness and alignment with experimental findings documented in existing literature. The collagen structures employed in this study depict a segment of human collagen type II, featuring a tertiary structural arrangement and the presence of critical residues and fragments, notably the prevalent triplet PRO-HYP-GLY. Despite the relatively short nature of the utilized peptide helices, they appear to offer sufficient insight into how the ratio of HYP to PRO can impact chitosan's affinity for collagen. However, certain aspects warrant further exploration in subsequent studies, such as the influence of the quantity of individual residues on collagen's affinity for chitosan. This aspect seems particularly significant within the framework of collagen's polyelectrolytic nature.
 
 ### Binding Energy
 ![Binding Energy](Files/BindingEnergy_vs_dd.png)
@@ -56,8 +56,8 @@ Ionic Interactions
 The script performs the following tasks:
 
 1. **Data Extraction**: Reads data files (`bindenergy_Mg.tab`) to extract binding energy or interaction data for different hydroxylation degrees.
-2. **Data Analysis**: Analyzes the extracted data to calculate averages, standard deviations, and R2 values for each set of values.
-3. **Visualization**: Generates plots depicting the relationship between interaction type and deacetylation degree, along with linear regression lines and R2 values.
+2. **Data Analysis**: Analyze the extracted data to calculate each set's averages, standard deviations, and R2 values.
+3. **Visualization**: This function generates plots depicting the relationship between interaction type and deacetylation degree, along with linear regression lines and R2 values.
 
 ## Installation
 
