@@ -28,7 +28,7 @@ perspective of collagen tertiary structure.
 
 Figure 1 b illustrates the subsequent phenomenon, chitosan deacetylation. For this depiction, the chitin structure retrieved from the PubChem database (800 Da) was employed to construct chitosan structures characterized by DD ranging from 12.5% to 100%.
 
-### Positions  of aminoacids. PRO, GLY, and HYP amino acids are denoted by light blue, dark blue, and green colors, respectively.
+Positions  of aminoacids. PRO, GLY, and HYP amino acids are denoted by light blue, dark blue, and green colors, respectively.
 ![Positions](Files/AA_positions.png)
 
 ### Docking results
